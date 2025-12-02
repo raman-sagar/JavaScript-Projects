@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cursor</title>
+    <style>
+      #cursor {
+        position: fixed;
+        width: 50px;
+        height: 50px;
+        border: 1px solid black;
+        border-radius: 50%;
+        transition: all 200ms ease-out;
+      }
+      .pointer {
+        width: 20px;
+        height: 20px;
+        background-color: #ddd;
+        border-radius: 50%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        transition: all 150ms ease-out;
+      }
+      .scale {
+        width: 50px;
+        height: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cursor">
+      <div class="pointer"></div>
+    </div>
+    <script>
+      const cursor = document.querySelector("#cursor");
+      const pointer = document.querySelector(".pointer");
+
+      document.addEventListener("mousemove", (e) => {
+        const x = e.clientX - 25;
+        const y = e.clientY - 25;
+        cursor.style.left = x + "px";
+        cursor.style.top = y + "px";
+      });
+
+      document.addEventListener("mousedown", (e) => {
+        pointer.classList.add("scale");
+      });
+
+      document.addEventListener("mouseup", (e) => {
+        pointer.classList.remove("scale");
+      });
+
+      document.addEventListener("mouseleave", () => {
+        cursor.style.opacity = "0";
+      });
+
+      document.addEventListener("mouseenter", () => {
+        cursor.style.opacity = "1";
+      });
+    </script>
+  </body>
+</html>

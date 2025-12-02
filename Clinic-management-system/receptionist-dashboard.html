@@ -1,0 +1,215 @@
+<!-- receptionist-dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Receptionist Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Receptionist Dashboard</h1>
+      <button id="logout">Logout</button>
+      <h2>Add New Patient Visit</h2>
+      <form id="addVisitForm">
+        <input type="text" id="name" placeholder="Name" required />
+        <input type="tel" id="phone" placeholder="Phone" required />
+        <input type="number" id="age" placeholder="Age" min="0" max="250" required />
+        <button type="submit">Generate Token & Add</button>
+      </form>
+      <h2>Completed Visits (With Prescription)</h2>
+      <ul id="completedVisits"></ul>
+      <h2>Patient History</h2>
+      <input type="search" id="searchPhone" placeholder="Search by Phone" />
+      <button id="searchHistory">Search</button>
+      <ul id="patientHistory"></ul>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        doc,
+        setDoc,
+        getDoc,
+        query,
+        where,
+        onSnapshot,
+        getDocs,
+        updateDoc,
+        runTransaction,
+        increment,
+      } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBHfNo5NSC1gVpLvEx4Ibs0EZBl_APulok",
+        authDomain: "clinic-management-system-a9234.firebaseapp.com",
+        projectId: "clinic-management-system-a9234",
+        storageBucket: "clinic-management-system-a9234.firebasestorage.app",
+        messagingSenderId: "408982581016",
+        appId: "1:408982581016:web:79006c91101829de4b386d",
+        measurementId: "G-5GYGHEDP06",
+      };
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      // console.log("Firebase initialized", app);
+      const auth = getAuth(app);
+      // console.log("Auth initialized", auth);
+      const db = getFirestore(app);
+      // console.log("Firestore initialized", db);
+
+      const addVisitForm = document.getElementById("addVisitForm");
+      const completedVisitsList = document.getElementById("completedVisits");
+      const patientHistoryList = document.getElementById("patientHistory");
+      const searchPhone = document.getElementById("searchPhone");
+      const searchHistoryBtn = document.getElementById("searchHistory");
+      const logoutBtn = document.getElementById("logout");
+
+      // Check if logged in
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          // User is signed in
+          console.log("User is signed in");
+        } else {
+          // No user is signed in
+          window.location.href = "index.html";
+        }
+      });
+
+      // Logout
+      logoutBtn.addEventListener("click", async () => {
+        await signOut(auth);
+        window.location.href = "index.html";
+      });
+
+      // Add new visit
+      addVisitForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = document.getElementById("name").value;
+        const phone = document.getElementById("phone").value;
+        const age = document.getElementById("age").value;
+
+        try {
+          // Check if patient exists
+          let patientId;
+          const patientQuery = query(
+            collection(db, "patients"),
+            where("phone", "==", phone)
+          );
+          const patientDocs = await getDocs(patientQuery);
+          if (patientDocs.empty) {
+            // Create new patient
+            const patientRef = await addDoc(collection(db, "patients"), {
+              name,
+              phone,
+              age,
+            });
+            patientId = patientRef.id;
+          } else {
+            patientId = patientDocs.docs[0].id;
+          }
+
+          // Generate token using transaction
+          const counterRef = doc(db, "counters", "tokens");
+          let newToken;
+          await runTransaction(db, async (transaction) => {
+            const counterDoc = await transaction.get(counterRef);
+            if (!counterDoc.exists()) {
+              transaction.set(counterRef, { current: 1 });
+              newToken = 1;
+            } else {
+              newToken = counterDoc.data().current + 1;
+              transaction.update(counterRef, { current: increment(1) });
+            }
+          });
+
+          // Add visit
+          await addDoc(collection(db, "visits"), {
+            patientId,
+            token: newToken,
+            date: new Date().toISOString(),
+            prescription: "",
+            bill: "",
+            phone, // For easy display
+          });
+          alert(`Visit added with Token: ${newToken}`);
+          addVisitForm.reset();
+        } catch (error) {
+          alert(error.message);
+        }
+      });
+
+      // Load completed visits (with prescription)
+      const completedQuery = query(
+        collection(db, "visits"),
+        where("prescription", "!=", "")
+      );
+      onSnapshot(completedQuery, (snapshot) => {
+        completedVisitsList.innerHTML = "";
+        snapshot.forEach((docSnap) => {
+          const visit = docSnap.data();
+          const li = document.createElement("li");
+          li.innerHTML = ` Token: ${visit.token} - Phone: ${visit.phone} - Prescription: ${visit.prescription};`;
+          if (!visit.bill) {
+            const billBtn = document.createElement("button");
+            billBtn.textContent = "Add Bill";
+            billBtn.addEventListener("click", async () => {
+              const billAmount = prompt("Enter Bill Amount:", "");
+              if (billAmount) {
+                await updateDoc(doc(db, "visits", docSnap.id), {
+                  bill: billAmount,
+                });
+                alert("Bill added");
+              }
+            });
+            li.appendChild(billBtn);
+          } else {
+            li.innerHTML += `- Bill: ${visit.bill};`;
+          }
+          completedVisitsList.appendChild(li);
+        });
+      });
+
+      // Search patient history
+      searchHistoryBtn.addEventListener("click", async () => {
+        const phone = searchPhone.value;
+        if (!phone) return;
+        const patientQuery = query(
+          collection(db, "patients"),
+          where("phone", "==", phone)
+        );
+        const patientDocs = await getDocs(patientQuery);
+        patientHistoryList.innerHTML = "";
+        if (patientDocs.empty) {
+          patientHistoryList.innerHTML = "<li>No patient found</li>";
+          return;
+        }
+        const patientId = patientDocs.docs[0].id;
+        const visitsQuery = query(
+          collection(db, "visits"),
+          where("patientId", "==", patientId)
+        );
+        const visitsDocs = await getDocs(visitsQuery);
+        visitsDocs.forEach((visitDoc) => {
+          const visit = visitDoc.data();
+          const li = document.createElement("li");
+          li.textContent = ` Token: ${visit.token}, Date: ${
+            visit.date
+          }, Prescription: ${visit.prescription || "None"}, Bill: ${
+            visit.bill || "None"
+          };`;
+          patientHistoryList.appendChild(li);
+        });
+      });
+    </script>
+  </body>
+</html>
+
