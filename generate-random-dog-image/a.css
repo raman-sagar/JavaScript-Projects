@@ -1,0 +1,40 @@
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(87, 54, 54);
+}
+
+#heading1 {
+  text-align: center;
+  background-color: aqua;
+  border-radius: 5px;
+  color: #651a91
+}
+
+#btn1 {
+  background-color: aqua;
+  margin-top: 2px;
+  width: 100%;
+  height: 40px;
+  border-radius: 5px;
+  font-size: 20px;
+  color: #651a91;
+  transition: all 1s ease;
+}
+
+#btn1:hover {
+  background-color: lightgreen;
+  cursor: pointer;
+  transform: scale(1.1, 1.1);
+}
+
+#img1 {
+  box-shadow: rgba(107, 4, 4, 0.925) 0px 5px 15px;
+  border-radius: 5px;
+}

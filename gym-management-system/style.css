@@ -1,0 +1,190 @@
+/* style.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background-color: #f0f2f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  background: rgb(161, 212, 191);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 800px;
+  margin: 20px;
+}
+
+h1,
+h2 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+input,
+select,
+textarea,
+button {
+  padding: 10px;
+  border: 1px solid #bcbebe;
+  border-radius: 4px;
+  font-size: 16px;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 1px solid rgb(0, 89, 255);
+}
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s linear;
+}
+
+.delete-button {
+  background-color: #dc3545;
+}
+.delete-button:hover {
+  background-color: #c82333;
+}
+
+button:active {
+  transform: scale(0.9);
+}
+button:hover {
+  background-color: #0056b3;
+}
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+#message {
+  margin-top: 10px;
+  color: red;
+}
+
+#supplementsList,
+#dietsList {
+  border: 2px solid rgb(127, 238, 24);
+  background: rgba(248, 2, 236, 0.418);
+  color: white;
+  max-height: 200px;
+  overflow: auto;
+  border-radius: 5px;
+}
+.list-item {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.list-item button {
+  padding: 5px 10px;
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .container {
+    margin: 10px;
+    padding: 15px;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    font-size: 14px;
+  }
+}
+.search-div {
+  position: relative;
+}
+.searchIcon {
+  border: 1px solid #aaa9a9;
+  background-color: white;
+  border-radius: 5px;
+  color: gray;
+  margin-left: 2px;
+  position: absolute;
+  cursor: pointer;
+  height: 38px;
+  transition: all 0.2s linear;
+}
+.searchIcon:active {
+  transform: scale(0.8);
+}
+
+.table-div {
+  overflow: auto;
+}
+.admin-table {
+  height: 200px;
+  width: 100%;
+  overflow: auto;
+  margin-bottom: 20px;
+  border-top: 2px solid #ccc;
+  border-bottom: 2px solid #ccc;
+  border-collapse: collapse;
+}
+
+table,
+tr,
+td,
+th {
+  border-top: 1px solid rgb(144, 144, 146);
+  border-bottom: 1px solid rgb(144, 144, 146);
+  color: black;
+  border-collapse: collapse;
+  padding: 5px;
+}
+
+tr:nth-child(even) {
+  background-color: rgb(245, 242, 242);
+}
+tr:nth-child(odd) {
+  background-color: rgb(223, 220, 220);
+}
+
+tr > th {
+  background-color: rgb(19, 7, 65);
+  color: white;
+}
+table {
+  width: 100%;
+  text-align: center;
+}
+.edit-delete {
+  display: flex;
+  justify-content: space-around;
+  border: none;
+}

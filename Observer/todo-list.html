@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo List</title>
+    <style>
+      body {
+        background-color: black;
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+      ul li {
+        width: 200px;
+        height: 1cm;
+        border-radius: 5px;
+        padding-left: 20px;
+        margin: 5px;
+        align-content: center;
+        background-color: rgb(34, 37, 37);
+        color: aliceblue;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <ul id="list">
+      <li class="todo">Item1</li>
+      <li class="todo">Item2</li>
+      <li class="todo">Item3</li>
+      <li class="todo">Item4</li>
+      <li class="todo">Item5</li>
+      <li class="todo">Item6</li>
+      <li class="todo">Item7</li>
+      <li class="todo">Item8</li>
+      <li class="todo">Item9</li>
+      <li class="todo">Item10</li>
+      <li class="todo">Item11</li>
+      <li class="todo">Item12</li>
+    </ul>
+    <script>
+      const list = document.getElementById("list");
+      function loaditem() {
+        for (let i = 0; i < 10; i++) {
+          const li = document.createElement("li");
+          li.className = "todo";
+          li.textContent = "new Todo";
+          list.appendChild(li);
+        }
+      }
+
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          loaditem();
+          observer.unobserve(entries[0].target);
+          observer.observe(document.querySelector(".todo:last-child"));
+        }
+      }, {});
+
+      const lastItem = document.querySelector(".todo:last-child");
+      observer.observe(lastItem);
+    </script>
+  </body>
+</html>
